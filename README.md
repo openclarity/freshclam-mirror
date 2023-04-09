@@ -13,7 +13,7 @@ The Dockerfile provides the definition for a server that serves the ClamAV signa
 - [Usage](#usage)
 - [Building](#building)
 - [Running](#running)
-- [Manual signatures download](#Mmanual-signatures-download)
+- [Manual signatures download](#manual-signatures-download)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
