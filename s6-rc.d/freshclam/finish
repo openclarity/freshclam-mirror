@@ -1,0 +1,23 @@
+#!/command/execlineb -S1
+
+
+# 0 : Database is up-to-date or successfully updated.
+# 40: Unknown option passed.
+# 50: Can't change directory.
+# 51: Can't check MD5 sum.
+# 52: Connection (network) problem.
+# 53: Can't unlink file.
+# 54: MD5 or digital signature verification error.
+# 55: Error reading file.
+# 56: Config file error.
+# 57: Can't create new file.
+# 58: Can't read database from remote server.
+# 59: Mirrors are not fully synchronized (try again later).
+# 60: Can't get information about '' user from /etc/passwd.
+# 61: Can't drop privileges.
+# 62: Can't initialize logger.
+
+# Ignore error codes: 0, 52, 58, 59
+if { eltest ${1} -ne 0 -a ${1} -ne 52 -a ${1} -ne 58 -a ${1} -ne 59 }
+
+/run/s6/basedir/bin/halt

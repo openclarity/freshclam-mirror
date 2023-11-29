@@ -1,12 +1,7 @@
 # Freshclam Mirror
 
-A private ClamAV freshclam mirror server which periodically syncs signatures
-using freshclam.
-
-This is achieved using nginx, freshclam and cron.
-
-The Dockerfile provides the definition for a server that serves the ClamAV signature files and updates them every 3 hours.
-
+Private ClamAV mirror server which periodically syncs signatures using `freshclam`.
+The `s6-overlay` is used as process supervisor for running `nginx` and `freshclam` daemons.
 
 ## Table of Contents<!-- omit in toc -->
 
@@ -21,9 +16,11 @@ The Dockerfile provides the definition for a server that serves the ClamAV signa
 # Usage
 
 ## Directing freshclam to use this mirror
-To direct your freshclam instance to this mirror, configure your freshclam.conf file as such:
+
+Update `freshclam.conf` file with the following settings to make `freshclam` to use this mirror:
+
 ```
-PrivateMirror http://<ip>:1000
+PrivateMirror http://<ip>:<port>
 ScriptedUpdates no
 ```
 
@@ -34,12 +31,12 @@ docker build -t <registry-name>/vmclarity-freshclam-mirror .
 
 ## Running
 ```
-docker run -d -p 1000:80 --name vmclarity-freshclam-mirror <registry-name>/vmclarity-freshclam-mirror
+docker run -d -p <port>:80 --name vmclarity-freshclam-mirror <registry-name>/vmclarity-freshclam-mirror
 ```
 
 ## Manual signatures download 
 ```
-curl -X GET http://<ip>:1000/clamav/main.cvd --output main.cvd
+curl -X GET http://<ip>:<port>/clamav/main.cvd --output main.cvd
 ```
 
 ## Contributing
