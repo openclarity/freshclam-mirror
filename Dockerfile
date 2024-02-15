@@ -1,4 +1,4 @@
-FROM nginx:1.25.3-alpine-slim
+FROM nginx:1.25.4-alpine-slim
 
 RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/community freshclam
 
