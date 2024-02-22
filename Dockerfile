@@ -15,7 +15,11 @@ ADD --link --chmod=644 clamav/freshclam.conf /etc/clamav/freshclam.conf
 VOLUME ["/var/lib/clamav"]
 
 # Fail the build if downloading updates gets rate-limited
-RUN freshclam --stdout --verbose --on-update-execute=/bin/false
+RUN <<EOT
+  set -eo pipefail
+
+  freshclam --stdout --verbose | grep 'You are on cool-down' && /bin/false
+EOT
 
 ARG TARGETPLATFORM
 
