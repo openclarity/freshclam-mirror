@@ -1,15 +1,30 @@
-FROM nginx:1.25.3-alpine-slim
+# syntax=docker/dockerfile:1@sha256:ac85f380a63b13dfcefa89046420e1781752bab202122f8f50032edf31be0021
 
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/community freshclam
+FROM alpine:3.19@sha256:c5b1261d6d3e43071626931fc004f70149baeba2c8ec672bd4f27761f8e1ad6b
+
+RUN apk add --no-cache ca-certificates nginx
+
+ADD --link nginx/default.conf /etc/nginx/http.d/default.conf
+
+RUN nginx -t
+
+RUN apk add --no-cache freshclam=1.2.2-r0
 
 ADD --link --chmod=644 clamav/freshclam.conf /etc/clamav/freshclam.conf
 
+VOLUME ["/var/lib/clamav"]
+
 # Fail the build if downloading updates gets rate-limited
-RUN freshclam --stdout --verbose --on-update-execute=/bin/false
+RUN <<EOT
+  set -eo pipefail
 
-ADD --link nginx/default.conf /etc/nginx/conf.d/default.conf
+  if freshclam --stdout --verbose | grep -i -e 'on cool-down until after' -e 'received error code 429 or 403'
+  then
+    printf "ERROR: %s\n" "failed to update one or more databases due to rate-limiting..."
+    exit 1
+  fi
 
-RUN nginx -t
+EOT
 
 ARG TARGETPLATFORM
 
@@ -48,6 +63,7 @@ RUN <<EOT
   wget -q -O "${archive}" "${url}"
   printf "%s %s" "${checksum}" "${archive}" | sha256sum -c -
   tar -C / -Jxpf "${archive}"
+  rm -f "${archive}"
 EOT
 
 ADD --link --chmod=755 s6-rc.d/freshclam /etc/s6-overlay/s6-rc.d/freshclam
