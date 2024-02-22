@@ -18,7 +18,12 @@ VOLUME ["/var/lib/clamav"]
 RUN <<EOT
   set -eo pipefail
 
-  freshclam --stdout --verbose | grep 'You are on cool-down' && /bin/false
+  if freshclam --stdout --verbose | grep -i -e 'on cool-down until after' -e 'received error code 429 or 403'
+  then
+    printf "ERROR: %s\n" "failed to update one or more databases due to rate-limiting..."
+    exit 1
+  fi
+
 EOT
 
 ARG TARGETPLATFORM
